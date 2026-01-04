@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import authRoute from "./routes/authRoute.js";
 import dashboardRoute from "./routes/dashboardRoute.js";
+import installmentRoute from "./routes/installmentRoute.js";
 import { downloadAppointmentLetterHandler } from "./controllers/userFeatureController.js";
 
 dotenv.config();
@@ -21,7 +22,9 @@ app.use(express.json());
 
 app.use("/api/auth", authRoute);
 app.use("/api/dashboard", dashboardRoute);
+app.use("/api/installment", installmentRoute);
 
-app.get("/api/download-appointment-letter", downloadAppointmentLetterHandler);
+
+app.get("/api/download-appointment-letter/:id", downloadAppointmentLetterHandler);
 
 export default app;

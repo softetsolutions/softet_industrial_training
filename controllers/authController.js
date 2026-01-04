@@ -1,30 +1,45 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import User from "../Model/User.js";
-
+import { nanoid } from "nanoid";
 export const signup = async (req, res) => {
   try {
-    const { name, email, number, password } = req.body;
+    const { name, email, number, password ,referredBy,course} = req.body;
 
-    if (!name || !email || !number || !password) {
+    if (!name || !email || !number || !password || !course) {
       return res.status(400).json({ message: "All fields required" });
     }
 
+      if (!["Java Full Stack", "MERN"].includes(course)) {
+      return res.status(400).json({ message: "Invalid course selection" });
+    }
     const userExists = await User.findOne({ email });
     if (userExists) {
       return res.status(400).json({ message: "Email already registered" });
     }
+     let validReferrer = null;
+    if (referredBy) {
+      validReferrer = await User.findOne({ referralCode: referredBy });
+      if (!validReferrer) {
+        return res.status(400).json({ message: "Invalid referral code" });
+      }
+    }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-
+const referralCode = nanoid(8);
     await User.create({
       name,
       email,
       number,
       password: hashedPassword,
+      referralCode,
+
+      
+      referredBy: referredBy || null,
+       course,
     });
 
-    res.status(201).json({ message: "Signup successful" });
+    res.status(201).json({ message: "Signup successful" , referredBy: referredBy || null, course,});
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });
   }
@@ -61,9 +76,12 @@ export const login = async (req, res) => {
       .json({
         message: "Login successful",
         user: {
+            _id: user._id,
           name: user.name,
           email: user.email,
           number: user.number,
+          firstInstallmentPaid: user.firstInstallment.paid,
+          course: user.course || "Not Selected",
         },
         token,
       });
@@ -76,8 +94,8 @@ export const logout = async (req, res) => {
     res
       .clearCookie("token", {
         httpOnly: true,
-        secure: true,        // keep true in production (https)
-        sameSite: "none",    // required for cross-site cookies
+        secure: true,        
+        sameSite: "none",    
       })
       .status(200)
       .json({
@@ -89,5 +107,32 @@ export const logout = async (req, res) => {
       success: false,
       message: "Logout failed",
     });
+  }
+};
+export const getMyProfile = async (req, res) => {
+  if (!req.user.referralCode) {
+    req.user.referralCode = nanoid(8);
+    await req.user.save();
+  }
+
+  res.json({
+    _id: req.user._id,      
+    name: req.user.name,
+    email: req.user.email,
+    referralCode: req.user.referralCode,
+  });
+};
+export const getMyReferrals = async (req, res) => {
+  try {
+    const myCode = req.user.referralCode;
+
+    const users = await User.find(
+      { referredBy: myCode },
+      "name email createdAt"
+    );
+
+    res.json({ users });
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
   }
 };

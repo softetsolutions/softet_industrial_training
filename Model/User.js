@@ -29,7 +29,36 @@ const userSchema = new mongoose.Schema(
       required: true,
       minlength: 6,
     },
+     referralCode: {
+      type: String,
+      unique: true,
+    },
+
+    referredBy: {
+      type: String, 
+      default: null,
+    },
+     firstInstallment: {
+      paid: { type: Boolean, default: false },
+      paidAt: { type: Date, default: null },
+      accessEnd: { type: Date, default: null }, // 1 month 10 days from paidAt
+    },
+    secondInstallment: {
+      paid: { type: Boolean, default: false },
+      paidAt: { type: Date, default: null },
+    },
+
+    dashboardBlocked: { type: Boolean, default: false },
+     
+    course: {
+      type: String,
+      required: true,
+        default: "Not Selected",
+
+      enum: ["Java Full Stack", "MERN"], 
+    },
   },
+  
   { timestamps: true }
 );
 

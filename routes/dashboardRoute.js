@@ -1,11 +1,12 @@
 
 import express from "express";
 import { authMiddleware } from "../middleware/authMiddleware.js";
+import { dashboardAccessMiddleware } from "../middleware/dashboardAccessMiddleware.js";
 
 const router = express.Router();
 
 
-router.get("/", authMiddleware, (req, res) => {
+router.get("/", authMiddleware, dashboardAccessMiddleware, (req, res) => {
   
   res.json({
     message: "Welcome to your dashboard!",
