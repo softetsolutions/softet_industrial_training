@@ -152,7 +152,7 @@ import User from "../Model/User.js";
 import mongoose from "mongoose";
 export const downloadAppointmentLetterHandler = async (req, res) => {
   try {
-     const userId = req.params.id;
+    const userId = req.params.id;
 
     if (!mongoose.Types.ObjectId.isValid(userId)) {
       return res.status(400).json({ message: "Invalid user id" });
@@ -165,10 +165,9 @@ export const downloadAppointmentLetterHandler = async (req, res) => {
     }
     const year = new Date().getFullYear();
 
+    const shortId = user._id.toString().slice(-4).toUpperCase();
 
-const shortId = user._id.toString().slice(-4).toUpperCase();
-
-const appointmentId = `SS-APT-${year}-${shortId}`;
+    const appointmentId = `SS-APT-${year}-${shortId}`;
 
     const data = {
       studentName: user.name,
@@ -206,7 +205,6 @@ const appointmentId = `SS-APT-${year}-${shortId}`;
     const contentWidth = 420;
     const centerX = (pageWidth - contentWidth) / 2;
 
-   
     doc.image(logoPath, 50, 45, { width: 70 });
 
     // Company info (RIGHT)
@@ -331,7 +329,7 @@ const appointmentId = `SS-APT-${year}-${shortId}`;
       align: "center",
     });
 
-    doc.text("Lucknow, Uttar Pradesh | GSTIN: 09CFYPT0083D1ZX", {
+    doc.text("Varanasi, Uttar Pradesh | GSTIN: 09CFYPT0083D1ZX", {
       align: "center",
     });
 
