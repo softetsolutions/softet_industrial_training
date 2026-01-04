@@ -148,16 +148,34 @@
 import PDFDocument from "pdfkit";
 import path from "path";
 import fs from "fs";
-
+import User from "../Model/User.js";
+import mongoose from "mongoose";
 export const downloadAppointmentLetterHandler = async (req, res) => {
   try {
+    const userId = req.params.id;
+
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ message: "Invalid user id" });
+    }
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const year = new Date().getFullYear();
+
+    const shortId = user._id.toString().slice(-4).toUpperCase();
+
+    const appointmentId = `SS-APT-${year}-${shortId}`;
+
     const data = {
-      studentName: "Rahul Sharma",
-      courseName: "MERN Stack Development",
-      joiningDate: "01 March 2025",
-      duration: "6 Months",
-      issueDate: "18 February 2025",
-      appointmentId: "SS-APT-2025-0142",
+      studentName: user.name,
+      courseName: user.course,
+      joiningDate: "05 January 2026",
+      duration: "3 Months",
+      issueDate: "05 January 2026",
+      appointmentId,
     };
 
     const logoPath = path.join(process.cwd(), "assets/softet-logo.png");
@@ -187,9 +205,6 @@ export const downloadAppointmentLetterHandler = async (req, res) => {
     const contentWidth = 420;
     const centerX = (pageWidth - contentWidth) / 2;
 
-    /* ================= HEADER ================= */
-
-    // Logo (LEFT, SMALLER)
     doc.image(logoPath, 50, 45, { width: 70 });
 
     // Company info (RIGHT)
@@ -314,7 +329,7 @@ export const downloadAppointmentLetterHandler = async (req, res) => {
       align: "center",
     });
 
-    doc.text("Lucknow, Uttar Pradesh | GSTIN: 09CFYPT0083D1ZX", {
+    doc.text("Varanasi, Uttar Pradesh | GSTIN: 09CFYPT0083D1ZX", {
       align: "center",
     });
 
