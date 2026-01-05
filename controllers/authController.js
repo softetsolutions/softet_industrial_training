@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import User from "../Model/User.js";
 import { nanoid } from "nanoid";
+
 export const signup = async (req, res) => {
   try {
     const { name, email, number, password ,referredBy,course} = req.body;
@@ -67,6 +68,7 @@ export const login = async (req, res) => {
       process.env.JWT_SECRET || "secret",
       { expiresIn: "7d" }
     );
+     
 
     res
       .cookie("token", token, {
@@ -81,7 +83,7 @@ export const login = async (req, res) => {
           email: user.email,
           number: user.number,
           firstInstallmentPaid: user.firstInstallment.paid,
-          course: user.course || "Not Selected",
+          course: user.course,
         },
         token,
       });

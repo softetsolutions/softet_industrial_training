@@ -53,7 +53,7 @@ const userSchema = new mongoose.Schema(
     course: {
       type: String,
       required: true,
-        default: "Not Selected",
+        //default: "Not Selected",
 
       enum: ["Java Full Stack", "MERN"], 
     },
