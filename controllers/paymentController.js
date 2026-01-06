@@ -1,9 +1,20 @@
 import User from "../Model/User.js";
+
 export const payFirstInstallment = async (req, res) => {
   try {
-    const user = req.user;
+    const { email } = req.body;
 
-    if (user.firstInstallment.paid) {
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (user.firstInstallment?.paid) {
       return res.status(400).json({ message: "First installment already paid" });
     }
 
@@ -17,29 +28,51 @@ export const payFirstInstallment = async (req, res) => {
       paidAt: now,
       accessEnd,
     };
-    user.dashboardBlocked = false; // allow access
+
+    user.dashboardBlocked = false;
+
     await user.save();
 
-    res.json({ message: "First installment paid successfully", accessEnd });
+    res.json({
+      message: "First installment paid successfully",
+      accessEnd,
+    });
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
+
 export const paySecondInstallment = async (req, res) => {
   try {
-    const user = req.user;
+    const { email } = req.body;
 
-    if (!user.firstInstallment.paid) {
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (!user.firstInstallment?.paid) {
       return res.status(400).json({ message: "First installment not paid yet" });
     }
 
-    if (user.secondInstallment.paid) {
-      return res.status(400).json({ message: "Second installment already paid" });
+    if (user.secondInstallment?.paid) {
+      return res
+        .status(400)
+        .json({ message: "Second installment already paid" });
     }
 
-    user.secondInstallment.paid = true;
-    user.secondInstallment.paidAt = new Date();
-    user.dashboardBlocked = false; // allow access after payment
+    user.secondInstallment = {
+      paid: true,
+      paidAt: new Date(),
+    };
+
+    user.dashboardBlocked = false;
+
     await user.save();
 
     res.json({ message: "Second installment paid successfully" });

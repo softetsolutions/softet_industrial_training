@@ -15,6 +15,12 @@ const userSchema = new mongoose.Schema(
       minlength: 10,
       maxlength: 15,
     },
+    role: {
+  type: String,
+  enum: ["user", "admin"],
+  default: "user",
+},
+
 
     email: {
       type: String,
@@ -38,6 +44,16 @@ const userSchema = new mongoose.Schema(
       type: String, 
       default: null,
     },
+    
+    referralCount: {
+      type: Number,
+      default: 0,
+    },
+
+    wallet: {
+      type: Number,
+      default: 0, // total cashback amount
+    },
      firstInstallment: {
       paid: { type: Boolean, default: false },
       paidAt: { type: Date, default: null },
@@ -53,7 +69,7 @@ const userSchema = new mongoose.Schema(
     course: {
       type: String,
       required: true,
-        default: "Not Selected",
+        //default: "Not Selected",
 
       enum: ["Java Full Stack", "MERN"], 
     },
