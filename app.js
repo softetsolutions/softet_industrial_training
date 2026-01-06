@@ -5,6 +5,7 @@ import cors from "cors";
 import authRoute from "./routes/authRoute.js";
 import dashboardRoute from "./routes/dashboardRoute.js";
 import installmentRoute from "./routes/installmentRoute.js";
+import refferalRoute from "./routes/refferalRoute.js";
 
 import { downloadAppointmentLetterHandler } from "./controllers/userFeatureController.js";
 
@@ -24,6 +25,7 @@ app.use(express.json());
 app.use("/api/auth", authRoute);
 app.use("/api/dashboard", dashboardRoute);
 app.use("/api/installment", installmentRoute);
+app.use("/api/referral", refferalRoute);
 
 
 app.get("/api/download-appointment-letter/:id", downloadAppointmentLetterHandler);

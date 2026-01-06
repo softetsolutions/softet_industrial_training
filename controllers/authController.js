@@ -138,3 +138,23 @@ export const getMyReferrals = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+export const getEnrolledReferralCount = async (req, res) => {
+  try {
+   
+
+    const myCode = req.user.referralCode;
+
+    const count = await User.countDocuments({
+      referredBy: myCode,
+      "firstInstallment.paid": true, 
+    });
+
+    res.json({
+      referralCode: myCode,
+      enrolledReferralCount: count,
+    });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
