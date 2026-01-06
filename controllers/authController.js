@@ -5,20 +5,20 @@ import { nanoid } from "nanoid";
 
 export const signup = async (req, res) => {
   try {
-    const { name, email, number, password ,referredBy,course} = req.body;
+    const { name, email, number, password, referredBy, course } = req.body;
 
     if (!name || !email || !number || !password || !course) {
       return res.status(400).json({ message: "All fields required" });
     }
 
-      if (!["Java Full Stack", "MERN"].includes(course)) {
+    if (!["Java Full Stack", "MERN"].includes(course)) {
       return res.status(400).json({ message: "Invalid course selection" });
     }
     const userExists = await User.findOne({ email });
     if (userExists) {
       return res.status(400).json({ message: "Email already registered" });
     }
-     let validReferrer = null;
+    let validReferrer = null;
     if (referredBy) {
       validReferrer = await User.findOne({ referralCode: referredBy });
       if (!validReferrer) {
@@ -27,7 +27,7 @@ export const signup = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-const referralCode = nanoid(8);
+    const referralCode = nanoid(8);
     await User.create({
       name,
       email,
@@ -35,12 +35,15 @@ const referralCode = nanoid(8);
       password: hashedPassword,
       referralCode,
 
-      
       referredBy: referredBy || null,
-       course,
+      course,
     });
 
-    res.status(201).json({ message: "Signup successful" , referredBy: referredBy || null, course,});
+    res.status(201).json({
+      message: "Signup successful",
+      referredBy: referredBy || null,
+      course,
+    });
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });
   }
@@ -68,17 +71,17 @@ export const login = async (req, res) => {
       process.env.JWT_SECRET || "secret",
       { expiresIn: "7d" }
     );
-     
 
     res
       .cookie("token", token, {
         httpOnly: true,
-        secure: false,
+        secure: true,
+        sameSite: "none",
       })
       .json({
         message: "Login successful",
         user: {
-            _id: user._id,
+          _id: user._id,
           name: user.name,
           email: user.email,
           number: user.number,
@@ -96,8 +99,8 @@ export const logout = async (req, res) => {
     res
       .clearCookie("token", {
         httpOnly: true,
-        secure: true,        
-        sameSite: "none",    
+        secure: true,
+        sameSite: "none",
       })
       .status(200)
       .json({
@@ -118,7 +121,7 @@ export const getMyProfile = async (req, res) => {
   }
 
   res.json({
-    _id: req.user._id,      
+    _id: req.user._id,
     name: req.user.name,
     email: req.user.email,
     referralCode: req.user.referralCode,
@@ -141,13 +144,11 @@ export const getMyReferrals = async (req, res) => {
 
 export const getEnrolledReferralCount = async (req, res) => {
   try {
-   
-
     const myCode = req.user.referralCode;
 
     const count = await User.countDocuments({
       referredBy: myCode,
-      "firstInstallment.paid": true, 
+      "firstInstallment.paid": true,
     });
 
     res.json({

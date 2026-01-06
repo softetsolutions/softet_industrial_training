@@ -13,21 +13,22 @@ dotenv.config();
 const app = express();
 app.use(
   cors({
-    origin: "http://localhost:5173", // exact frontend URL
-    credentials: true, 
+    origin: ["http://localhost:5173", "https://www.softetsolutions.com"], // exact frontend URL
+    credentials: true,
   })
 );
 
 app.use(cookieParser());
 app.use(express.json());
 
-
 app.use("/api/auth", authRoute);
 app.use("/api/dashboard", dashboardRoute);
 app.use("/api/installment", installmentRoute);
 app.use("/api/referral", refferalRoute);
 
-
-app.get("/api/download-appointment-letter/:id", downloadAppointmentLetterHandler);
+app.get(
+  "/api/download-appointment-letter/:id",
+  downloadAppointmentLetterHandler
+);
 
 export default app;
