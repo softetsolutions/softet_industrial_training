@@ -69,7 +69,7 @@ export const login = async (req, res) => {
     const token = jwt.sign(
       { id: user._id },
       process.env.JWT_SECRET || "secret",
-      { expiresIn: "7d" }
+      { expiresIn: "7d" },
     );
 
     res
@@ -133,7 +133,7 @@ export const getMyReferrals = async (req, res) => {
 
     const users = await User.find(
       { referredBy: myCode },
-      "name email createdAt"
+      "name email createdAt",
     );
 
     res.json({ users });
@@ -154,6 +154,25 @@ export const getEnrolledReferralCount = async (req, res) => {
     res.json({
       referralCode: myCode,
       enrolledReferralCount: count,
+    });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+
+export const getSecondInstallmentPriceToPayByEmail = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email }).select("referralCode");
+    if (!user) {
+      throw new Error("User not found");
+    }
+    const count = await User.countDocuments({
+      referredBy: user.referralCode,
+    });
+    res.status(200).json({
+      referralCount: count,
+      secondInstallmentAmount: 3500 - count * 500,
     });
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });

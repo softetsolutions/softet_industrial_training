@@ -1,8 +1,23 @@
 import express from "express";
-import { getEnrolledReferralCount} from "../controllers/authController.js";
+import {
+  getEnrolledReferralCount,
+  getSecondInstallmentPriceToPayByEmail,
+} from "../controllers/authController.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
+import { adminMiddleware } from "../middleware/adminMiddleware.js";
 const router = express.Router();
 
-router.get("/dashboard/getEnrolledReferralCount", authMiddleware, getEnrolledReferralCount);
+router.get(
+  "/dashboard/getEnrolledReferralCount",
+  authMiddleware,
+  getEnrolledReferralCount,
+);
 
-export default router
+router.post(
+  "/dashboard/getSecondInstallmentPriceToPayByEmail",
+  authMiddleware,
+  adminMiddleware,
+  getSecondInstallmentPriceToPayByEmail,
+);
+
+export default router;
