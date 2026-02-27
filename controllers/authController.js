@@ -120,11 +120,16 @@ export const getMyProfile = async (req, res) => {
     await req.user.save();
   }
 
+  const user = await User.findById(req.user._id).select(
+    "firstInstallment secondInstallment",
+  );
+
   res.json({
     _id: req.user._id,
     name: req.user.name,
     email: req.user.email,
     referralCode: req.user.referralCode,
+    fullyPaid: user.firstInstallment.paid && user.secondInstallment.paid,
   });
 };
 export const getMyReferrals = async (req, res) => {
